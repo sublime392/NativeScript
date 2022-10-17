@@ -439,7 +439,7 @@ export class Animation extends AnimationBase {
 
 	private static _createNativeAnimation(propertyAnimations: Array<PropertyAnimation>, index: number, playSequentially: boolean, args: AnimationInfo, animation: PropertyAnimation, valueSource: 'animation' | 'keyframe', finishedCallback: (cancelled?: boolean) => void) {
 		const nativeView = <UIView>animation.target.nativeViewProtected;
-		if (nativeView?.layer) {
+		
 			let nativeAnimation;
 
 			if (args.subPropertiesToAnimate) {
@@ -450,9 +450,11 @@ export class Animation extends AnimationBase {
 
 			const animationDelegate = AnimationDelegateImpl.initWithFinishedCallback(finishedCallback, animation, valueSource);
 			nativeAnimation.setValueForKey(animationDelegate, 'delegate');
-
-			nativeView.layer.addAnimationForKey(nativeAnimation, args.propertyNameToAnimate);
-
+			
+		  if (nativeView?.layer) {
+				nativeView.layer.addAnimationForKey(nativeAnimation, args.propertyNameToAnimate);
+			}
+		
 			let callback = undefined;
 			if (index + 1 < propertyAnimations.length) {
 				callback = Animation._createiOSAnimationFunction(propertyAnimations, index + 1, playSequentially, valueSource, finishedCallback);
@@ -462,7 +464,7 @@ export class Animation extends AnimationBase {
 					animationDelegate.nextAnimation = callback;
 				}
 			}
-		}
+		
 	}
 
 	private static _createGroupAnimation(args: AnimationInfo, animation: PropertyAnimation) {
